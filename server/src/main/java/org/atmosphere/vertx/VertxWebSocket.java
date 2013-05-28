@@ -23,9 +23,13 @@ import org.vertx.java.core.http.ServerWebSocket;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * An Atmosphere's {@link org.atmosphere.websocket.WebSocket} wrapper around a {@link ServerWebSocket}
+ *
+ * @author Jeanfrancois Arcand
+ */
 public class VertxWebSocket extends org.atmosphere.websocket.WebSocket {
     private static final Logger logger = LoggerFactory.getLogger(VertxWebSocket.class);
-
     private final AtomicBoolean isOpen = new AtomicBoolean(true);
     private final ServerWebSocket webSocket;
 

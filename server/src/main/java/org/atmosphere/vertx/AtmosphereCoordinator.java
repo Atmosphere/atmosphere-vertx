@@ -35,8 +35,10 @@ import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.SimpleHandler;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.ServerWebSocket;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -216,4 +218,64 @@ public class AtmosphereCoordinator {
         return keptOpen;
     }
 
+    /**
+     * Route an http request inside the {@link AtmosphereFramework}
+     * @param request
+     */
+    public void route(HttpServerRequest request) {
+        boolean keepAlive = false;
+        boolean async = false;
+        try {
+            VertxAsyncIOWriter w = new VertxAsyncIOWriter(request);
+            final AtmosphereRequest r = AtmosphereUtils.request(request);
+            final AtmosphereResponse res = new AtmosphereResponse.Builder()
+                    .asyncIOWriter(w)
+                    .writeHeader(false)
+                    .request(r).build();
+
+            request.response.exceptionHandler(new Handler<Exception>() {
+                @Override
+                public void handle(Exception event) {
+                    try {
+                        logger.debug("", event);
+                        AsynchronousProcessor.class.cast(AtmosphereCoordinator.instance().framework().getAsyncSupport())
+                                .cancelled(r, res);
+                    } catch (IOException e) {
+                        logger.debug("", e);
+                    } catch (ServletException e) {
+                        logger.debug("", e);
+                    }
+                }
+            });
+
+            if (r.getMethod().equalsIgnoreCase("POST")) {
+                async = true;
+                keepAlive = true;
+                request.bodyHandler(new Handler<Buffer>() {
+                    @Override
+                    public void handle(Buffer body) {
+                        r.body(body.toString());
+                        try {
+                            AtmosphereCoordinator.instance().route(r, res);
+                        } catch (IOException e1) {
+                            logger.debug("", e1);
+                        }
+                    }
+                });
+                request.response.end();
+            }
+            ;
+
+            if (!async) {
+                keepAlive = AtmosphereCoordinator.instance().route(r, res);
+            }
+        } catch (Throwable e) {
+            logger.error("", e);
+            keepAlive = true;
+        } finally {
+            if (!keepAlive) {
+                request.response.close();
+            }
+        }
+    }
 }

@@ -19,19 +19,11 @@ import org.atmosphere.cpr.AtmosphereRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.SimpleHandler;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class AtmosphereUtils {
 
@@ -84,9 +76,9 @@ public class AtmosphereUtils {
                 .remotePort(port)
                 .remoteAddr(uriString)
                 .remoteHost(host)
-                        //                .localPort(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getPort())
-                        //                .localAddr(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getAddress().getHostAddress())
-                        //                .localName(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getHostName())
+//                .localPort(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getPort())
+//                .localAddr(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getAddress().getHostAddress())
+//                .localName(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getHostName())
                 .body(b.toString())
                 .queryStrings(qs)
                 .build();
