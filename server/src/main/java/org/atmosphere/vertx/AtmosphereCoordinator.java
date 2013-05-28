@@ -24,12 +24,23 @@ import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.atmosphere.cpr.HeaderConfig;
+import org.atmosphere.cpr.WebSocketProcessorFactory;
 import org.atmosphere.util.EndpointMapper;
 import org.atmosphere.util.ExecutorsFactory;
+import org.atmosphere.websocket.WebSocket;
+import org.atmosphere.websocket.WebSocketProcessor;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.SimpleHandler;
+import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.ServerWebSocket;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +48,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.atmosphere.cpr.HeaderConfig.X_ATMOSPHERE_TRANSPORT;
 
+/**
+ * This class control the {@link AtmosphereFramework} life cycle.
+ *
+ * @author Jean-Francois Arcand
+ */
 public class AtmosphereCoordinator {
     private static final Logger logger = LoggerFactory.getLogger(AtmosphereCoordinator.class);
 
@@ -44,12 +60,14 @@ public class AtmosphereCoordinator {
     public final static AtmosphereCoordinator instance = new AtmosphereCoordinator();
     private final ScheduledExecutorService suspendTimer;
     private final EndpointMapper<AtmosphereFramework.AtmosphereHandlerWrapper> mapper;
+    private final WebSocketProcessor webSocketProcessor;
 
     private AtmosphereCoordinator() {
         framework = new AtmosphereFramework();
         framework.setAsyncSupport(new NettyCometSupport(framework().getAtmosphereConfig()));
         suspendTimer = ExecutorsFactory.getScheduler(framework.getAtmosphereConfig());
         mapper = framework.endPointMapper();
+        webSocketProcessor = WebSocketProcessorFactory.getDefault().getWebSocketProcessor(framework);
     }
 
     public AtmosphereCoordinator discover(Class<?> clazz) {
@@ -67,7 +85,7 @@ public class AtmosphereCoordinator {
         return mapper.map(path, framework().getAtmosphereHandlers()) == null ? false : true;
     }
 
-    public AtmosphereCoordinator path(String mappingPath){
+    public AtmosphereCoordinator path(String mappingPath) {
         framework.addInitParameter(ApplicationConfig.ATMOSPHERE_HANDLER_MAPPING, mappingPath);
         return this;
     }
@@ -83,6 +101,63 @@ public class AtmosphereCoordinator {
 
     public AtmosphereFramework framework() {
         return framework;
+    }
+
+    /**
+     * Route the {@link ServerWebSocket} into the {@link AtmosphereFramework}
+     *
+     * @param webSocket the {@link ServerWebSocket}
+     */
+    public void route(ServerWebSocket webSocket) {
+        Map<String, List<String>> paramMap = new QueryStringDecoder(webSocket.path.replaceFirst("@", "?")).getParameters();
+        LinkedHashMap params = new LinkedHashMap<String, List<String>>(paramMap.size());
+        for (Map.Entry<String, List<String>> entry : paramMap.entrySet()) {
+            params.put(entry.getKey(), entry.getValue().get(0));
+        }
+
+        if (params.size() == 0) {
+            // TODO: vert.x trim the query string, unfortunately.
+            params.put(HeaderConfig.X_ATMO_PROTOCOL, new String[]{"true"});
+            params.put(HeaderConfig.X_ATMOSPHERE_FRAMEWORK, new String[]{"1.1"});
+            params.put(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, new String[]{"0"});
+            params.put(HeaderConfig.X_ATMOSPHERE_TRANSPORT, new String[]{"websocket"});
+        }
+
+        AtmosphereRequest.Builder requestBuilder = new AtmosphereRequest.Builder();
+        AtmosphereRequest r = requestBuilder
+                .requestURI("/")
+                .pathInfo(webSocket.path)
+                .queryStrings(params)
+                .build();
+
+        final WebSocket w = new VertxWebSocket(AtmosphereCoordinator.instance().framework().getAtmosphereConfig(), webSocket);
+        try {
+            webSocketProcessor.open(w, r, AtmosphereResponse.newInstance(framework.getAtmosphereConfig(), r, w));
+        } catch (IOException e) {
+            logger.debug("", e);
+        }
+
+        webSocket.dataHandler(new Handler<Buffer>() {
+            @Override
+            public void handle(Buffer data) {
+                webSocketProcessor.invokeWebSocketProtocol(w, data.toString());
+            }
+        });
+        webSocket.exceptionHandler(new Handler<Exception>() {
+            @Override
+            public void handle(Exception event) {
+                w.close();
+                logger.debug("", event);
+                webSocketProcessor.close(w, 1006);
+            }
+        });
+        webSocket.closedHandler(new SimpleHandler() {
+            @Override
+            protected void handle() {
+                w.close();
+                webSocketProcessor.close(w, 1005);
+            }
+        });
     }
 
     public boolean route(AtmosphereRequest request, AtmosphereResponse response) throws IOException {
@@ -140,4 +215,5 @@ public class AtmosphereCoordinator {
         }
         return keptOpen;
     }
+
 }

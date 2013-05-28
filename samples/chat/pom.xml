@@ -37,7 +37,7 @@
                 <artifactId>vertx-maven-plugin</artifactId>
                 <version>1.3.0.1</version>
                 <configuration>
-                    <verticleName>org.nettosphere.samples.chat.VertxChatServer</verticleName>
+                    <verticleName>org.atmosphere.vertx.samples.chat.VertxChatServer</verticleName>
                 </configuration>
             </plugin>
             <!--<plugin>-->

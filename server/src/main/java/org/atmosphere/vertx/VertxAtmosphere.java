@@ -15,17 +15,16 @@
  */
 package org.atmosphere.vertx;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.http.ServerWebSocket;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-public class VertxAtmosphere  {
+public class VertxAtmosphere {
+    private static final Logger logger = LoggerFactory.getLogger(VertxAtmosphere.class);
 
     private final Builder b;
 
@@ -33,87 +32,65 @@ public class VertxAtmosphere  {
         this.b = b;
 
         RouteMatcher routeMatcher = new RouteMatcher();
-		routeMatcher.get(b.url, inject());
-		routeMatcher.post(b.url, inject());
-		routeMatcher.noMatch(b.httpServer.requestHandler());
-		
-		b.httpServer.requestHandler(routeMatcher);
-		b.httpServer.websocketHandler(injectWS());
+        routeMatcher.get(b.url, handleHttp());
+        routeMatcher.post(b.url, handleHttp());
+        routeMatcher.noMatch(b.httpServer.requestHandler());
+
+        b.httpServer.requestHandler(routeMatcher);
+        b.httpServer.websocketHandler(handleWebSocket());
 
         if (b.resource != null) {
             AtmosphereCoordinator.instance().discover(b.resource);
         }
         AtmosphereCoordinator.instance().ready();
-	}
+    }
 
-   public final static class Builder {
+    public final static class Builder {
 
-       private String url;
-       private HttpServer httpServer;
-       private Class<?> resource;
+        private String url;
+        private HttpServer httpServer;
+        private Class<?> resource;
+        private AtmosphereCoordinator coordinator;
 
-       public Builder url(String url) {
-           this.url = url;
-           return this;
-       }
+        public Builder url(String url) {
+            this.url = url;
+            return this;
+        }
 
-       public Builder httpServer(HttpServer httpServer) {
-           this.httpServer = httpServer;
-           return this;
-       }
+        public Builder httpServer(HttpServer httpServer) {
+            this.httpServer = httpServer;
+            return this;
+        }
 
-       public VertxAtmosphere build(){
-           return new VertxAtmosphere(this);
-       }
+        public VertxAtmosphere build() {
+            coordinator = AtmosphereCoordinator.instance();
+            return new VertxAtmosphere(this);
+        }
 
-       public Builder resource(Class<?> resource) {
-           this.resource = resource;
-           return this;
-       }
-   }
+        public Builder resource(Class<?> resource) {
+            this.resource = resource;
+            return this;
+        }
+    }
 
-	private Handler<HttpServerRequest> inject() {
-		return new Handler<HttpServerRequest>() {
-			@Override
-			public void handle(HttpServerRequest req) {
+    private Handler<HttpServerRequest> handleHttp() {
+
+        return new Handler<HttpServerRequest>() {
+            @Override
+            public void handle(HttpServerRequest req) {
+                logger.trace("HTTP received");
                 new VertxAsyncIOWriter(req);
-			}
-		};
-	}
+            }
+        };
+    }
 
-
-	private Handler<ServerWebSocket> injectWS() {
-		return new Handler<ServerWebSocket>() {
-			Handler<ServerWebSocket> old = b.httpServer.websocketHandler();
-			@Override
-			public void handle(ServerWebSocket webSocket) {
-				if (webSocket.path.startsWith(b.url)) {
-					new VertxWebSocket(AtmosphereCoordinator.instance().framework().getAtmosphereConfig(), webSocket);
-				}
-
-				if (old != null) {
-					old.handle(webSocket);
-				}
-			}
-		};
-	}
-
-	private void write(InputStream in, OutputStream out) throws IOException {
-		try {
-			byte[] buffer = new byte[4096];
-			int bytesRead = -1;
-			while ((bytesRead = in.read(buffer)) != -1) {
-				out.write(buffer, 0, bytesRead);
-			}
-			out.flush();
-		} finally {
-			try {
-				in.close();
-			} catch (IOException ex) {}
-			try {
-				out.close();
-			} catch (IOException ex) {}
-		}
-	}
-
+    private Handler<ServerWebSocket> handleWebSocket() {
+        return new Handler<ServerWebSocket>() {
+            @Override
+            public void handle(ServerWebSocket webSocket) {
+                logger.trace("WebSocket received {}", webSocket);
+                b.coordinator.route(webSocket);
+            }
+        };
+    }
 }
