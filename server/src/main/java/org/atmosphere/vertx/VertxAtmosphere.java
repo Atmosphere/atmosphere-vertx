@@ -34,6 +34,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A boostrap class that can be used to bridge Atmosphere and Vert.x. As simple as
+ * <pre><blockquote>
+ public class VertxJerseyChat extends Verticle {
+
+     private static final Logger logger = LoggerFactory.getLogger(VertxJerseyChat.class);
+
+     @Override
+     public void start() throws Exception {
+         VertxAtmosphere.Builder b = new VertxAtmosphere.Builder();
+         HttpServer httpServer = vertx.createHttpServer();
+
+         httpServer.requestHandler(new Handler&gt;HttpServerRequest&lt;() {
+             public void handle(HttpServerRequest req) {
+                 String path = req.path;
+                 if (path.equals("/")) {
+                     path = "/index.html";
+                 }
+
+                 logger.info("Servicing request {}", path);
+                 req.response.sendFile("src/main/resources" + path);
+             }
+         });
+
+         b.resource(ResourceChat.class)
+          .initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json")
+          .httpServer(httpServer).url("/chat").build();
+
+         httpServer.listen(8080);
+     }
+ }
+ * </blockquote></pre>
+ * @author  Jeanfrancois Arcand
+ */
 public class VertxAtmosphere {
     private static final Logger logger = LoggerFactory.getLogger(VertxAtmosphere.class);
 
@@ -84,11 +118,20 @@ public class VertxAtmosphere {
             return this;
         }
 
+        /**
+         * Set the Vert.x {@link HttpServer}
+         * @param httpServer a Vert.x {@link HttpServer}
+         * @return this
+         */
         public Builder httpServer(HttpServer httpServer) {
             this.httpServer = httpServer;
             return this;
         }
 
+        /**
+         * Create the associated {@link VertxAtmosphere}
+         * @return a  {@link VertxAtmosphere}
+         */
         public VertxAtmosphere build() {
             return new VertxAtmosphere(this);
         }
