@@ -69,6 +69,7 @@ public class AtmosphereUtils {
                 .pathInfo(url.substring(l))
                 .headers(getHeaders(request))
                 .method(method)
+                .requestURL(request.uri)
                 .contentType(ct)
                 .destroyable(false)
                 .attributes(attributes)

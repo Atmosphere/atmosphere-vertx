@@ -62,17 +62,16 @@ public class AtmosphereCoordinator {
     private final AtmosphereFramework framework;
     private final ScheduledExecutorService suspendTimer;
     private final EndpointMapper<AtmosphereFramework.AtmosphereHandlerWrapper> mapper;
-    private final WebSocketProcessor webSocketProcessor;
+    private  WebSocketProcessor webSocketProcessor;
 
     AtmosphereCoordinator() {
         framework = new AtmosphereFramework();
         framework.setAsyncSupport(new NettyCometSupport(framework().getAtmosphereConfig()));
         suspendTimer = ExecutorsFactory.getScheduler(framework.getAtmosphereConfig());
         mapper = framework.endPointMapper();
-        webSocketProcessor = WebSocketProcessorFactory.getDefault().getWebSocketProcessor(framework);
     }
 
-    public AtmosphereCoordinator configure(VertxAtmosphere.Builder b) {
+    public AtmosphereCoordinator configure(final VertxAtmosphere.Builder b) {
         try {
             if (b.broadcasterFactory != null) {
                 framework.setBroadcasterFactory(b.broadcasterFactory);
@@ -97,6 +96,9 @@ public class AtmosphereCoordinator {
             framework.interceptor(i);
         }
 
+        for (Map.Entry<String,String> e : b.initParams.entrySet()){
+            framework.addInitParameter(e.getKey(),e.getValue());
+        }
         discover(b.resource);
 
         return this;
@@ -109,6 +111,8 @@ public class AtmosphereCoordinator {
 
     public AtmosphereCoordinator ready() {
         framework().init();
+        webSocketProcessor = WebSocketProcessorFactory.getDefault().getWebSocketProcessor(framework);
+
         return this;
     }
 
@@ -140,23 +144,30 @@ public class AtmosphereCoordinator {
      * @param webSocket the {@link ServerWebSocket}
      */
     public AtmosphereCoordinator route(ServerWebSocket webSocket) {
+        // TODO
         Map<String, List<String>> paramMap = new QueryStringDecoder(webSocket.path.replaceFirst("@", "?")).getParameters();
         LinkedHashMap params = new LinkedHashMap<String, List<String>>(paramMap.size());
         for (Map.Entry<String, List<String>> entry : paramMap.entrySet()) {
             params.put(entry.getKey(), entry.getValue().get(0));
         }
 
+        String contentType = "application/json";
         if (params.size() == 0) {
             // TODO: vert.x trim the query string, unfortunately.
             params.put(HeaderConfig.X_ATMO_PROTOCOL, new String[]{"true"});
             params.put(HeaderConfig.X_ATMOSPHERE_FRAMEWORK, new String[]{"1.1"});
             params.put(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, new String[]{"0"});
             params.put(HeaderConfig.X_ATMOSPHERE_TRANSPORT, new String[]{"websocket"});
+            params.put("Content-Type",  new String[]{contentType});
+        } else if ( params.get("Content-Type") != null) {
+            contentType = (String) params.get("Content-Type");
         }
 
         AtmosphereRequest.Builder requestBuilder = new AtmosphereRequest.Builder();
         AtmosphereRequest r = requestBuilder
-                .requestURI("/")
+                .requestURI(webSocket.path)
+                .requestURL("http://0.0.0.0" + webSocket.path)
+                .contentType(contentType)
                 .pathInfo(webSocket.path)
                 .queryStrings(params)
                 .build();

@@ -104,6 +104,7 @@
         <module>server</module>
         <module>assembly</module>
         <module>samples/chat</module>
+        <module>samples/jersey-chat</module>
     </modules>
 
     <build>
