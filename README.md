@@ -1,4 +1,4 @@
-## Vertosphere: A Java WebSocket and HTTP server powered by the [Atmosphere Framework](http://github.com/Atmosphere/atmosphere) and the [Vert.x](http://vertx.io/)  Framework.
+### Vertosphere: A Java WebSocket and HTTP server powered by the [Atmosphere Framework](http://github.com/Atmosphere/atmosphere) and the [Vert.x](http://vertx.io/)  Framework.
 
 The easiest way to get started with Vert.x is to download a sample and start it. [Or look at the Javadoc](http://atmosphere.github.com/atmopshere-vertx/apidocs/). You can download the [Chat]() or [Jersey]() distribution.
 
