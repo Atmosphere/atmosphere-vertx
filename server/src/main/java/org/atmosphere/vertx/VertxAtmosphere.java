@@ -41,7 +41,6 @@ import java.util.Map;
 
      private static final Logger logger = LoggerFactory.getLogger(VertxJerseyChat.class);
 
-     @Override
      public void start() throws Exception {
          VertxAtmosphere.Builder b = new VertxAtmosphere.Builder();
          HttpServer httpServer = vertx.createHttpServer();
