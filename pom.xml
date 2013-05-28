@@ -104,7 +104,6 @@
         <module>server</module>
         <module>assembly</module>
         <module>samples/chat</module>
-        <module>samples/games</module>
     </modules>
 
     <build>

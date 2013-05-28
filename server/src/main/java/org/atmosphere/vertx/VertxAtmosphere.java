@@ -15,6 +15,12 @@
  */
 package org.atmosphere.vertx;
 
+import org.atmosphere.cpr.AtmosphereInterceptor;
+import org.atmosphere.cpr.Broadcaster;
+import org.atmosphere.cpr.BroadcasterCache;
+import org.atmosphere.cpr.BroadcasterFactory;
+import org.atmosphere.websocket.WebSocketProtocol;
+import org.atmosphere.websocket.protocol.SimpleHttpProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
@@ -23,10 +29,16 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.http.ServerWebSocket;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class VertxAtmosphere {
     private static final Logger logger = LoggerFactory.getLogger(VertxAtmosphere.class);
 
     private final Builder b;
+    private final AtmosphereCoordinator coordinator = new AtmosphereCoordinator();
 
     private VertxAtmosphere(Builder b) {
         this.b = b;
@@ -40,17 +52,32 @@ public class VertxAtmosphere {
         b.httpServer.websocketHandler(handleWebSocket());
 
         if (b.resource != null) {
-            AtmosphereCoordinator.instance().discover(b.resource);
+            coordinator.configure(b);
         }
-        AtmosphereCoordinator.instance().ready();
+        coordinator.ready();
+    }
+
+    /**
+     * Is the path match one of the resource deployed.
+     * @param path
+     * @return boolean if true.
+     */
+    public boolean matchPath(String path) {
+        return coordinator.matchPath(path);
     }
 
     public final static class Builder {
 
-        private String url;
-        private HttpServer httpServer;
-        private Class<?> resource;
-        private AtmosphereCoordinator coordinator;
+        protected String url;
+        protected HttpServer httpServer;
+        protected Class<?> resource;
+        protected final Map<String, String> initParams = new HashMap<String, String>();
+        protected Class<? extends WebSocketProtocol> webSocketProtocol = SimpleHttpProtocol.class;
+
+        protected Class<Broadcaster> broadcasterClass;
+        protected BroadcasterFactory broadcasterFactory;
+        protected Class<? extends BroadcasterCache> broadcasterCache;
+        protected final List<AtmosphereInterceptor> interceptors = new ArrayList<AtmosphereInterceptor>();
 
         public Builder url(String url) {
             this.url = url;
@@ -63,14 +90,90 @@ public class VertxAtmosphere {
         }
 
         public VertxAtmosphere build() {
-            coordinator = AtmosphereCoordinator.instance();
             return new VertxAtmosphere(this);
         }
 
+        /**
+         * An annotated Atmosphere class. Supported annotation are {@link org.atmosphere.config.service.ManagedService},
+         * {@link org.atmosphere.config.service.AtmosphereHandlerService}, {@link org.atmosphere.config.service.MeteorService},
+         * {@link org.atmosphere.config.service.WebSocketHandlerService} and any Jersey resource.
+         *
+         * @param resource
+         * @return this;
+         */
         public Builder resource(Class<?> resource) {
             this.resource = resource;
             return this;
         }
+
+        /**
+         * Add some init param
+         *
+         * @param name  the name
+         * @param value the value
+         * @return this
+         */
+        public Builder initParam(String name, String value) {
+            initParams.put(name, value);
+            return this;
+        }
+
+        /**
+         * Configure the default {@link Broadcaster}
+         *
+         * @param broadcasterClass a Broadcaster
+         * @return this
+         */
+        public Builder broadcaster(Class<Broadcaster> broadcasterClass) {
+            this.broadcasterClass = broadcasterClass;
+            return this;
+        }
+
+        /**
+         * Configure the default {@link BroadcasterFactory}
+         *
+         * @param broadcasterFactory a BroadcasterFactory's class
+         * @return this
+         */
+        public Builder broadcasterFactory(BroadcasterFactory broadcasterFactory) {
+            this.broadcasterFactory = broadcasterFactory;
+            return this;
+        }
+
+        /**
+         * Configure the default {@link BroadcasterCache}
+         *
+         * @param broadcasterCache a BroadcasterCache's class
+         * @return this
+         */
+        public Builder broadcasterCache(Class<? extends BroadcasterCache> broadcasterCache) {
+            this.broadcasterCache = broadcasterCache;
+            return this;
+        }
+
+        /**
+         * Configure the default {@link WebSocketProtocol}
+         *
+         * @param webSocketProtocol a WebSocketProtocol's class
+         * @return this
+         */
+        public Builder webSocketProtocol(Class<? extends WebSocketProtocol> webSocketProtocol) {
+            this.webSocketProtocol = webSocketProtocol;
+            return this;
+        }
+
+        /**
+         * Add an {@link AtmosphereInterceptor}
+         *
+         * @param interceptor an {@link AtmosphereInterceptor}
+         * @return
+         */
+        public Builder interceptor(AtmosphereInterceptor interceptor) {
+            interceptors.add(interceptor);
+            return this;
+        }
+
+
     }
 
     private Handler<HttpServerRequest> handleHttp() {
@@ -79,7 +182,7 @@ public class VertxAtmosphere {
             @Override
             public void handle(HttpServerRequest req) {
                 logger.trace("HTTP received");
-                b.coordinator.route(req);
+                coordinator.route(req);
             }
         };
     }
@@ -89,7 +192,7 @@ public class VertxAtmosphere {
             @Override
             public void handle(ServerWebSocket webSocket) {
                 logger.trace("WebSocket received {}", webSocket);
-                b.coordinator.route(webSocket);
+                coordinator.route(webSocket);
             }
         };
     }

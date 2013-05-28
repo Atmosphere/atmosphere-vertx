@@ -35,6 +35,7 @@ public class VertxChatServer extends Verticle {
     public void start() throws Exception {
         VertxAtmosphere.Builder b = new VertxAtmosphere.Builder();
         HttpServer httpServer = vertx.createHttpServer();
+
         httpServer.requestHandler(new Handler<HttpServerRequest>() {
             public void handle(HttpServerRequest req) {
                 String path = req.path;
@@ -43,13 +44,11 @@ public class VertxChatServer extends Verticle {
                 }
 
                 logger.info("Servicing request {}", path);
-                if (!req.path.startsWith("/chat")) {
-                    req.response.sendFile("src/main/resources" + path);
-                }
+                req.response.sendFile("src/main/resources" + path);
             }
         });
 
-        b.resource(Chat.class).httpServer(httpServer).url("/chat").build();
+        b.resource(ChatRoom.class).httpServer(httpServer).url("/chat/:room").build();
 
         httpServer.listen(8080);
     }

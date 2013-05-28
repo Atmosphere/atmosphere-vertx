@@ -94,7 +94,7 @@
                 <executions>
                     <execution>
                         <id>osgi-bundle</id>
-                        <phase>package</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>bundle</goal>
                         </goals>

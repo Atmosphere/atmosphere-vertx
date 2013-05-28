@@ -20,6 +20,7 @@ import org.atmosphere.cpr.Action;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AsynchronousProcessor;
 import org.atmosphere.cpr.AtmosphereFramework;
+import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.FrameworkConfig;
@@ -59,17 +60,46 @@ public class AtmosphereCoordinator {
     private static final Logger logger = LoggerFactory.getLogger(AtmosphereCoordinator.class);
 
     private final AtmosphereFramework framework;
-    public final static AtmosphereCoordinator instance = new AtmosphereCoordinator();
     private final ScheduledExecutorService suspendTimer;
     private final EndpointMapper<AtmosphereFramework.AtmosphereHandlerWrapper> mapper;
     private final WebSocketProcessor webSocketProcessor;
 
-    private AtmosphereCoordinator() {
+    AtmosphereCoordinator() {
         framework = new AtmosphereFramework();
         framework.setAsyncSupport(new NettyCometSupport(framework().getAtmosphereConfig()));
         suspendTimer = ExecutorsFactory.getScheduler(framework.getAtmosphereConfig());
         mapper = framework.endPointMapper();
         webSocketProcessor = WebSocketProcessorFactory.getDefault().getWebSocketProcessor(framework);
+    }
+
+    public AtmosphereCoordinator configure(VertxAtmosphere.Builder b) {
+        try {
+            if (b.broadcasterFactory != null) {
+                framework.setBroadcasterFactory(b.broadcasterFactory);
+            }
+        } catch (Throwable t) {
+            logger.trace("", t);
+        }
+
+        if (b.broadcasterCache != null) {
+            try {
+                framework.setBroadcasterCacheClassName(b.broadcasterCache.getName());
+            } catch (Throwable t) {
+                logger.trace("", t);
+            }
+        }
+
+        if (b.webSocketProtocol != null) {
+            framework.setWebSocketProtocolClassName(b.webSocketProtocol.getName());
+        }
+
+        for (AtmosphereInterceptor i : b.interceptors) {
+            framework.interceptor(i);
+        }
+
+        discover(b.resource);
+
+        return this;
     }
 
     public AtmosphereCoordinator discover(Class<?> clazz) {
@@ -78,13 +108,16 @@ public class AtmosphereCoordinator {
     }
 
     public AtmosphereCoordinator ready() {
-        framework().addInitParameter(ApplicationConfig.ALLOW_QUERYSTRING_AS_REQUEST, "false");
         framework().init();
         return this;
     }
 
     public boolean matchPath(String path) {
-        return mapper.map(path, framework().getAtmosphereHandlers()) == null ? false : true;
+        try {
+            return mapper.map(path, framework().getAtmosphereHandlers()) == null ? false : true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
     }
 
     public AtmosphereCoordinator path(String mappingPath) {
@@ -95,10 +128,6 @@ public class AtmosphereCoordinator {
     public AtmosphereCoordinator shutdown() {
         framework.destroy();
         return this;
-    }
-
-    public static final AtmosphereCoordinator instance() {
-        return instance;
     }
 
     public AtmosphereFramework framework() {
@@ -132,7 +161,7 @@ public class AtmosphereCoordinator {
                 .queryStrings(params)
                 .build();
 
-        final WebSocket w = new VertxWebSocket(AtmosphereCoordinator.instance().framework().getAtmosphereConfig(), webSocket);
+        final WebSocket w = new VertxWebSocket(framework.getAtmosphereConfig(), webSocket);
         try {
             webSocketProcessor.open(w, r, AtmosphereResponse.newInstance(framework.getAtmosphereConfig(), r, w));
         } catch (IOException e) {
@@ -216,7 +245,7 @@ public class AtmosphereCoordinator {
                 public void handle(Exception event) {
                     try {
                         logger.debug("exceptionHandler", event);
-                        AsynchronousProcessor.class.cast(AtmosphereCoordinator.instance().framework().getAsyncSupport())
+                        AsynchronousProcessor.class.cast(framework.getAsyncSupport())
                                 .cancelled(r, res);
                     } catch (IOException e) {
                         logger.debug("", e);
@@ -233,7 +262,7 @@ public class AtmosphereCoordinator {
                     public void handle(Buffer body) {
                         r.body(body.toString());
                         try {
-                            AtmosphereCoordinator.instance().route(r, res);
+                            route(r, res);
                             request.response.end();
                         } catch (IOException e1) {
                             logger.debug("", e1);
