@@ -4,7 +4,7 @@ The easiest way to get started with Vert.x is to download a sample and start it.
 
 ```bash
    % unzip vertx-<name>-distribution.jar
-   % vertx
+   % vertx VertxAtmosphere -cp:classes:vertx-<name>-distribution.jar
 ```
 
 Samples are the same as then one available in Atmosphere, e.g everything that works with Atmosphere works AS-IT-IS with the Vert.x module.
