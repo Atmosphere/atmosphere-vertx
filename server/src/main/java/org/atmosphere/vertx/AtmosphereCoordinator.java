@@ -110,7 +110,7 @@ public class AtmosphereCoordinator {
      *
      * @param webSocket the {@link ServerWebSocket}
      */
-    public void route(ServerWebSocket webSocket) {
+    public AtmosphereCoordinator route(ServerWebSocket webSocket) {
         Map<String, List<String>> paramMap = new QueryStringDecoder(webSocket.path.replaceFirst("@", "?")).getParameters();
         LinkedHashMap params = new LinkedHashMap<String, List<String>>(paramMap.size());
         for (Map.Entry<String, List<String>> entry : paramMap.entrySet()) {
@@ -160,14 +160,11 @@ public class AtmosphereCoordinator {
                 webSocketProcessor.close(w, 1005);
             }
         });
+        return this;
     }
 
-    public boolean route(AtmosphereRequest request, AtmosphereResponse response) throws IOException {
-        boolean resumeOnBroadcast = false;
-        boolean keptOpen = true;
-        boolean skipClose = false;
+    public AtmosphereCoordinator route(AtmosphereRequest request, AtmosphereResponse response) throws IOException {
         final VertxAsyncIOWriter w = VertxAsyncIOWriter.class.cast(response.getAsyncIOWriter());
-
         try {
 
             Action a = framework.doCometSupport(request, response);
@@ -179,16 +176,7 @@ public class AtmosphereCoordinator {
                 transport = request.getHeader(X_ATMOSPHERE_TRANSPORT);
             }
 
-            if (a.type() == Action.TYPE.SUSPEND) {
-                if (transport.equalsIgnoreCase(HeaderConfig.LONG_POLLING_TRANSPORT) || transport.equalsIgnoreCase(HeaderConfig.JSONP_TRANSPORT)) {
-                    resumeOnBroadcast = true;
-                }
-            } else {
-                keptOpen = false;
-            }
-
-            logger.debug("Transport {} resumeOnBroadcast {}", transport, resumeOnBroadcast);
-
+            logger.debug("Transport {} action {}", transport, a);
             final Action action = (Action) request.getAttribute(NettyCometSupport.SUSPEND);
             if (action != null && action.type() == Action.TYPE.SUSPEND && action.timeout() != -1) {
                 final AtomicReference<Future<?>> f = new AtomicReference();
@@ -201,29 +189,19 @@ public class AtmosphereCoordinator {
                         }
                     }
                 }, action.timeout(), action.timeout(), TimeUnit.MILLISECONDS));
-            } else if (action != null && action.type() == Action.TYPE.RESUME) {
-                resumeOnBroadcast = false;
             }
-            w.resumeOnBroadcast(resumeOnBroadcast);
         } catch (Throwable e) {
             logger.error("Unable to process request", e);
-            keptOpen = false;
-        } finally {
-            if (w != null && !resumeOnBroadcast && !keptOpen) {
-                if (!skipClose) {
-                    w.close((AtmosphereResponse) null);
-                }
-            }
         }
-        return keptOpen;
+        return this;
     }
 
     /**
      * Route an http request inside the {@link AtmosphereFramework}
+     *
      * @param request
      */
-    public void route(HttpServerRequest request) {
-        boolean keepAlive = false;
+    public AtmosphereCoordinator route(final HttpServerRequest request) {
         boolean async = false;
         try {
             VertxAsyncIOWriter w = new VertxAsyncIOWriter(request);
@@ -237,7 +215,7 @@ public class AtmosphereCoordinator {
                 @Override
                 public void handle(Exception event) {
                     try {
-                        logger.debug("", event);
+                        logger.debug("exceptionHandler", event);
                         AsynchronousProcessor.class.cast(AtmosphereCoordinator.instance().framework().getAsyncSupport())
                                 .cancelled(r, res);
                     } catch (IOException e) {
@@ -250,32 +228,26 @@ public class AtmosphereCoordinator {
 
             if (r.getMethod().equalsIgnoreCase("POST")) {
                 async = true;
-                keepAlive = true;
                 request.bodyHandler(new Handler<Buffer>() {
                     @Override
                     public void handle(Buffer body) {
                         r.body(body.toString());
                         try {
                             AtmosphereCoordinator.instance().route(r, res);
+                            request.response.end();
                         } catch (IOException e1) {
                             logger.debug("", e1);
                         }
                     }
                 });
-                request.response.end();
             }
-            ;
 
             if (!async) {
-                keepAlive = AtmosphereCoordinator.instance().route(r, res);
+                route(r, res);
             }
         } catch (Throwable e) {
             logger.error("", e);
-            keepAlive = true;
-        } finally {
-            if (!keepAlive) {
-                request.response.close();
-            }
         }
+        return this;
     }
 }

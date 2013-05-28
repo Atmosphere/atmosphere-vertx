@@ -16,11 +16,10 @@
 package org.atmosphere.vertx;
 
 import org.atmosphere.cpr.AsyncIOWriter;
-import org.atmosphere.cpr.AsynchronousProcessor;
 import org.atmosphere.cpr.AtmosphereInterceptorWriter;
-import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
-import org.atmosphere.cpr.FrameworkConfig;
 import org.atmosphere.util.ByteArrayAsyncWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +34,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class VertxAsyncIOWriter extends AtmosphereInterceptorWriter {
     private static final Logger logger = LoggerFactory.getLogger(VertxAsyncIOWriter.class);
     private final AtomicInteger pendingWrite = new AtomicInteger();
-    private final AtomicBoolean asyncClose = new AtomicBoolean(false);
     private final AtomicBoolean isClosed = new AtomicBoolean(false);
     private final ByteArrayAsyncWriter buffer = new ByteArrayAsyncWriter();
-    private boolean byteWritten = false;
     private long lastWrite = 0;
-    private boolean resumeOnBroadcast;
     private final HttpServerResponse out;
     private boolean headerWritten = false;
 
@@ -50,14 +46,6 @@ public class VertxAsyncIOWriter extends AtmosphereInterceptorWriter {
 
     public boolean isClosed() {
         return isClosed.get();
-    }
-
-    public boolean byteWritten() {
-        return byteWritten;
-    }
-
-    public void resumeOnBroadcast(boolean resumeOnBroadcast) {
-        this.resumeOnBroadcast = resumeOnBroadcast;
     }
 
     @Override
@@ -110,24 +98,15 @@ public class VertxAsyncIOWriter extends AtmosphereInterceptorWriter {
             headerWritten = true;
         }
 
-        out.write(new String(data, offset, length, r.getCharacterEncoding()));
-        byteWritten = true;
+        String sdata = new String(data, offset, length, r.getCharacterEncoding());
+        out.write(sdata);
         lastWrite = System.currentTimeMillis();
-        if (resumeOnBroadcast) {
-            out.close();
-            _close(r.request());
+
+        AtmosphereResourceImpl impl = AtmosphereResourceImpl.class.cast(r.resource());
+        if (sdata.trim().length() > 0 && impl.transport().equals(AtmosphereResource.TRANSPORT.LONG_POLLING)) {
+            close(r);
         }
         return this;
-    }
-
-    private void _close(AtmosphereRequest request) {
-        final AsynchronousProcessor.AsynchronousProcessorHook hook = (AsynchronousProcessor.AsynchronousProcessorHook)
-                request.getAttribute(FrameworkConfig.ASYNCHRONOUS_HOOK);
-        if (hook != null) {
-            hook.closed();
-        } else {
-            logger.error("Unable to close properly {}", request.resource().uuid());
-        }
     }
 
     public long lastTick() {
@@ -136,13 +115,13 @@ public class VertxAsyncIOWriter extends AtmosphereInterceptorWriter {
 
     @Override
     public void close(AtmosphereResponse r) throws IOException {
-        // Make sure we don't have bufferred bytes
-        if (!byteWritten && r != null && r.getOutputStream() != null) {
-            r.getOutputStream().flush();
+        if (!isClosed.getAndSet(true)) {
+            try {
+                out.end();
+            } catch (IllegalStateException ex) {
+                logger.trace("", ex);
+            }
         }
-
-        asyncClose.set(true);
-        out.close();
     }
 
     // Duplicate from AtmosphereResource.constructStatusAndHeaders

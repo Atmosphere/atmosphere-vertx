@@ -79,7 +79,6 @@ public class VertxAtmosphere {
             @Override
             public void handle(HttpServerRequest req) {
                 logger.trace("HTTP received");
-                new VertxAsyncIOWriter(req);
                 b.coordinator.route(req);
             }
         };
