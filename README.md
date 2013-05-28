@@ -19,7 +19,6 @@ Download Vert.x extension [) or use Maven
      </dependency>
 ```
 For example, the famous [multi-room Chat application](https://github.com/Atmosphere/atmosphere-vertx/blob/master/samples/chat/src/main/java/org/atmosphere/vertx/samples/chat/ChatRoom.java#L37-L124) in Atmosphere
-```
 Can be run on top of Vert.x by doing:
 ```java
 public class VertxChatServer extends Verticle {
