@@ -72,7 +72,10 @@ public class VertxJerseyChat extends Verticle {
             }
         });
 
-        b.resource(ResourceChat.class).initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json").httpServer(httpServer).url("/chat").build();
+        b.resource(ResourceChat.class)
+         .initParam(ApplicationConfig.WEBSOCKET_CONTENT_TYPE, "application/json")
+         .httpServer(httpServer).url("/chat")
+         .build();
 
         httpServer.listen(8080);
     }
