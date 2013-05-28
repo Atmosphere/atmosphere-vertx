@@ -28,6 +28,7 @@ import org.atmosphere.cpr.HeaderConfig;
 import org.atmosphere.cpr.WebSocketProcessorFactory;
 import org.atmosphere.util.EndpointMapper;
 import org.atmosphere.util.ExecutorsFactory;
+import org.atmosphere.util.ServletProxyFactory;
 import org.atmosphere.websocket.WebSocket;
 import org.atmosphere.websocket.WebSocketProcessor;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
@@ -41,6 +42,7 @@ import org.vertx.java.core.http.ServerWebSocket;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +101,14 @@ public class AtmosphereCoordinator {
         for (Map.Entry<String,String> e : b.initParams.entrySet()){
             framework.addInitParameter(e.getKey(),e.getValue());
         }
+
+        ServletProxyFactory.getDefault().addMethodHandler("getServerInfo", new ServletProxyFactory.MethodHandler() {
+            @Override
+            public Object handle(Object clazz, Method method, Object[] methodObjects) {
+                return "Vertosphere/1.0.0";
+            }
+        });
+
         discover(b.resource);
 
         return this;
