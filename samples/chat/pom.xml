@@ -3,14 +3,14 @@
     <parent>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-vertx-project</artifactId>
-        <version>1.0.0.beta1</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.atmosphere.vertx.samples</groupId>
     <artifactId>vertx-chat</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0.beta1</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>vertx Chat</name>
     <url>http://maven.apache.org</url>
 
