@@ -156,9 +156,9 @@ public class AtmosphereCoordinator {
     public AtmosphereCoordinator route(ServerWebSocket webSocket) {
         // TODO
         Map<String, List<String>> paramMap = new QueryStringDecoder(webSocket.path.replaceFirst("@", "?")).getParameters();
-        LinkedHashMap params = new LinkedHashMap<String, List<String>>(paramMap.size());
+        Map<String, String[]> params = new LinkedHashMap<String, String[]>(paramMap.size());
         for (Map.Entry<String, List<String>> entry : paramMap.entrySet()) {
-            params.put(entry.getKey(), entry.getValue().get(0));
+            params.put(entry.getKey(), entry.getValue().toArray(new String[]{}));
         }
 
         String contentType = "application/json";
@@ -168,9 +168,9 @@ public class AtmosphereCoordinator {
             params.put(HeaderConfig.X_ATMOSPHERE_FRAMEWORK, new String[]{"1.1"});
             params.put(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, new String[]{"0"});
             params.put(HeaderConfig.X_ATMOSPHERE_TRANSPORT, new String[]{"websocket"});
-            params.put("Content-Type",  new String[]{contentType});
-        } else if ( params.get("Content-Type") != null) {
-            contentType = (String) params.get("Content-Type");
+            params.put("Content-Type", new String[]{contentType});
+        } else if (params.containsKey("Content-Type") && params.get("Content-Type").length > 0) {
+            contentType = params.get("Content-Type")[0];
         }
 
         AtmosphereRequest.Builder requestBuilder = new AtmosphereRequest.Builder();
