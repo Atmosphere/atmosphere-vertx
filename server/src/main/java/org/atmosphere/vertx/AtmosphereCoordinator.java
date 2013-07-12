@@ -155,7 +155,10 @@ public class AtmosphereCoordinator {
      */
     public AtmosphereCoordinator route(ServerWebSocket webSocket) {
         // TODO
-        Map<String, List<String>> paramMap = new QueryStringDecoder(webSocket.path.replaceFirst("@", "?")).getParameters();
+    	String url = webSocket.path.replaceFirst("@", "?");
+    	String uri = webSocket.path.substring(0, webSocket.path.indexOf('@'));
+    	
+        Map<String, List<String>> paramMap = new QueryStringDecoder(url).getParameters();
         Map<String, String[]> params = new LinkedHashMap<String, String[]>(paramMap.size());
         for (Map.Entry<String, List<String>> entry : paramMap.entrySet()) {
             params.put(entry.getKey(), entry.getValue().toArray(new String[]{}));
@@ -175,13 +178,13 @@ public class AtmosphereCoordinator {
 
         AtmosphereRequest.Builder requestBuilder = new AtmosphereRequest.Builder();
         AtmosphereRequest r = requestBuilder
-                .requestURI(webSocket.path)
-                .requestURL("http://0.0.0.0" + webSocket.path)
+                .requestURI(uri)
+                .requestURL("http://0.0.0.0" + url)
                 .contentType(contentType)
-                .pathInfo(webSocket.path)
+                .pathInfo(uri)
                 .queryStrings(params)
                 .build();
-
+        
         final WebSocket w = new VertxWebSocket(framework.getAtmosphereConfig(), webSocket);
         try {
             webSocketProcessor.open(w, r, AtmosphereResponse.newInstance(framework.getAtmosphereConfig(), r, w));
