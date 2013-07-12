@@ -91,6 +91,14 @@ public class VertxAtmosphere {
     }
 
     /**
+     * Return the bound @{link AtmosphereCoordinator}.
+     * @return @{link AtmosphereCoordinator}.
+     */
+    public AtmosphereCoordinator coordinator() {
+        return coordinator;
+    }
+
+    /**
      * Is the path match one of the resource deployed.
      * @param path
      * @return boolean if true.
