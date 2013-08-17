@@ -22,29 +22,29 @@ import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.deploy.Verticle;
+import org.vertx.java.platform.Verticle;
 
 /**
- * A bootstrap class that start Nettosphere and the Atmosphere Chat samples.
+ * A bootstrap class that start Vertosphere and the Atmosphere Chat samples.
  */
 public class VertxJerseyChat extends Verticle {
 
     private static final Logger logger = LoggerFactory.getLogger(VertxJerseyChat.class);
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         VertxAtmosphere.Builder b = new VertxAtmosphere.Builder();
         HttpServer httpServer = vertx.createHttpServer();
 
         httpServer.requestHandler(new Handler<HttpServerRequest>() {
             public void handle(HttpServerRequest req) {
-                String path = req.path;
+                String path = req.path();
                 if (path.equals("/")) {
                     path = "/index.html";
                 }
 
                 logger.info("Servicing request {}", path);
-                req.response.sendFile("src/main/resources" + path);
+                req.response().sendFile("webapp/" + path);
             }
         });
 
