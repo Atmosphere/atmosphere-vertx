@@ -41,7 +41,7 @@ public class VertxAsyncIOWriter extends AtmosphereInterceptorWriter {
     private boolean headerWritten = false;
 
     public VertxAsyncIOWriter(final HttpServerRequest request) {
-        out = request.response;
+        out = request.response();
     }
 
     public boolean isClosed() {
