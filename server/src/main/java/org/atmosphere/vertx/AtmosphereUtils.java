@@ -15,15 +15,18 @@
  */
 package org.atmosphere.vertx;
 
+import io.netty.handler.codec.http.HttpHeaders;
+
 import org.atmosphere.cpr.AtmosphereRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.http.HttpServerRequest;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class AtmosphereUtils {
 
@@ -31,17 +34,17 @@ public class AtmosphereUtils {
 
     public final static AtmosphereRequest request(final HttpServerRequest request) throws Throwable {
         final String base = getBaseUri(request);
-        final URI requestUri = new URI(base.substring(0, base.length() - 1) + request.uri);
+        final URI requestUri = new URI(base.substring(0, base.length() - 1) + request.uri());
         String ct = "text/plain";
         if (request.headers().get("Content-Type") != null) {
             ct = request.headers().get("Content-Type");
         }
-        String method = request.method;
+        String method = request.method();
 
 
         URI uri = null;
         try {
-            uri = URI.create(request.uri);
+            uri = URI.create(request.uri());
         } catch (IllegalArgumentException e) {
             logger.trace("", e);
         }
@@ -69,7 +72,7 @@ public class AtmosphereUtils {
                 .pathInfo(url.substring(l))
                 .headers(getHeaders(request))
                 .method(method)
-                .requestURL(request.uri)
+                .requestURL(request.uri())
                 .contentType(ct)
                 .destroyable(false)
                 .attributes(attributes)
@@ -105,7 +108,7 @@ public class AtmosphereUtils {
     public static Map<String, String> getHeaders(final HttpServerRequest request) {
         final Map<String, String> headers = new HashMap<String, String>();
 
-        for (Map.Entry<String, String> e : request.headers().entrySet()) {
+        for (Entry<String, String> e : request.headers()) {
             headers.put(e.getKey().toLowerCase(), e.getValue());
         }
 
