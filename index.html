@@ -1,63 +1,134 @@
-<!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
-  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Atmosphere-vertx : Atmosphere for Vert.x" />
 
-  <title>Atmosphere-vertx</title>
-  <meta name="description" content="Atmosphere for Vert.x">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Atmosphere-vertx</title>
+  </head>
 
-</head>
+  <body>
 
-<body>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/Atmosphere/atmosphere-vertx">View on GitHub</a>
 
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Atmosphere-vertx</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">Atmosphere for Vert.x</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/Atmosphere/atmosphere-vertx/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/Atmosphere/atmosphere-vertx/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/Atmosphere/atmosphere-vertx" class="code">View Atmosphere-vertx on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h3>Welcome to Vertosphere Pages.</h3>
-        </article>
-      </div>
+          <h1 id="project_title">Atmosphere-vertx</h1>
+          <h2 id="project_tagline">Atmosphere for Vert.x</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/Atmosphere/atmosphere-vertx/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/Atmosphere/atmosphere-vertx/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
     </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/Atmosphere" class="avatar"><img src="https://secure.gravatar.com/avatar/d26b59d2fd0a38685aa54f6c1904d8e2?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png" width="48" height="48"/></a> <a href="https://github.com/Atmosphere">Atmosphere</a> maintains <a href="https://github.com/Atmosphere/atmosphere-vertx">Atmosphere-vertx</a></p>
 
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a name="vertosphere-a-java-websocket-and-http-server-powered-by-the-atmosphere-framework-and-the-vertx--framework" class="anchor" href="#vertosphere-a-java-websocket-and-http-server-powered-by-the-atmosphere-framework-and-the-vertx--framework"><span class="octicon octicon-link"></span></a>Vertosphere: A Java WebSocket and HTTP server powered by the <a href="http://github.com/Atmosphere/atmosphere">Atmosphere Framework</a> and the <a href="http://vertx.io/">Vert.x</a>  Framework.</h3>
 
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/Atmosphere/atmosphere-vertx/tarball/master" class="tar">tar</a><a href="https://github.com/Atmosphere/atmosphere-vertx/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
+<p>The easiest way to get started with Vert.x is to download a sample and start it. <a href="http://atmosphere.github.io/atmosphere-vertx/apidocs/">Or look at the Javadoc</a>. You can download the <a href="">Chat</a> or <a href="">Jersey</a> distribution.</p>
 
-            <script type="text/javascript">
+<div class="highlight highlight-bash"><pre>   % unzip vertx-&lt;name&gt;-distribution.jar
+   % vertx VertxAtmosphere -cp:classes:vertx-&lt;name&gt;-distribution.jar
+</pre></div>
+
+<p>Samples are the same as then one available in Atmosphere, e.g everything that works with Atmosphere works AS-IT-IS with the Vert.x module.</p>
+
+<p>Download Vert.x extension [) or use Maven</p>
+
+<div class="highlight highlight-xml"><pre>     <span class="nt">&lt;dependency&gt;</span>
+         <span class="nt">&lt;groupId&gt;</span>org.atmosphere<span class="nt">&lt;/groupId&gt;</span>
+         <span class="nt">&lt;artifactId&gt;</span>atmosphere-vertx<span class="nt">&lt;/artifactId&gt;</span>
+         <span class="nt">&lt;version&gt;</span>1.0.0.beta1<span class="nt">&lt;/version&gt;</span>
+     <span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+<p>For example, the famous <a href="https://github.com/Atmosphere/atmosphere-vertx/blob/master/samples/chat/src/main/java/org/atmosphere/vertx/samples/chat/ChatRoom.java#L37-L124">multi-room Chat application</a> in Atmosphere
+Can be run on top of Vert.x by doing:</p>
+
+<div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">VertxChatServer</span> <span class="kd">extends</span> <span class="n">Verticle</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">VertxChatServer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">VertxAtmosphere</span><span class="o">.</span><span class="na">Builder</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">VertxAtmosphere</span><span class="o">.</span><span class="na">Builder</span><span class="o">();</span>
+        <span class="n">HttpServer</span> <span class="n">httpServer</span> <span class="o">=</span> <span class="n">vertx</span><span class="o">.</span><span class="na">createHttpServer</span><span class="o">();</span>
+
+        <span class="n">httpServer</span><span class="o">.</span><span class="na">requestHandler</span><span class="o">(</span><span class="k">new</span> <span class="n">Handler</span><span class="o">&lt;</span><span class="n">HttpServerRequest</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">(</span><span class="n">HttpServerRequest</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">String</span> <span class="n">path</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="na">path</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">"/"</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="s">"/index.html"</span><span class="o">;</span>
+                <span class="o">}</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Servicing request {}"</span><span class="o">,</span> <span class="n">path</span><span class="o">);</span>
+                <span class="n">req</span><span class="o">.</span><span class="na">response</span><span class="o">.</span><span class="na">sendFile</span><span class="o">(</span><span class="s">"src/main/resources"</span> <span class="o">+</span> <span class="n">path</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+
+        <span class="n">b</span><span class="o">.</span><span class="na">resource</span><span class="o">(</span><span class="n">ChatRoom</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">httpServer</span><span class="o">(</span><span class="n">httpServer</span><span class="o">).</span><span class="na">url</span><span class="o">(</span><span class="s">"/chat/:room"</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+
+        <span class="n">httpServer</span><span class="o">.</span><span class="na">listen</span><span class="o">(</span><span class="mi">8080</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>Same for Jersey. You can run any <a href="https://github.com/Atmosphere/atmosphere-vertx/blob/master/samples/jersey-chat/src/main/java/org/atmosphere/vertx/samples/chat/ResourceChat.java#L36-L61">Jersey resource</a> like
+can be boostrapped by doing</p>
+
+<div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">VertxJerseyChat</span> <span class="kd">extends</span> <span class="n">Verticle</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">VertxJerseyChat</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">VertxAtmosphere</span><span class="o">.</span><span class="na">Builder</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">VertxAtmosphere</span><span class="o">.</span><span class="na">Builder</span><span class="o">();</span>
+        <span class="n">HttpServer</span> <span class="n">httpServer</span> <span class="o">=</span> <span class="n">vertx</span><span class="o">.</span><span class="na">createHttpServer</span><span class="o">();</span>
+
+        <span class="n">httpServer</span><span class="o">.</span><span class="na">requestHandler</span><span class="o">(</span><span class="k">new</span> <span class="n">Handler</span><span class="o">&lt;</span><span class="n">HttpServerRequest</span><span class="o">&gt;()</span> <span class="o">{</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">(</span><span class="n">HttpServerRequest</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">String</span> <span class="n">path</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="na">path</span><span class="o">;</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">"/"</span><span class="o">))</span> <span class="o">{</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="s">"/index.html"</span><span class="o">;</span>
+                <span class="o">}</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Servicing request {}"</span><span class="o">,</span> <span class="n">path</span><span class="o">);</span>
+                <span class="n">req</span><span class="o">.</span><span class="na">response</span><span class="o">.</span><span class="na">sendFile</span><span class="o">(</span><span class="s">"src/main/resources"</span> <span class="o">+</span> <span class="n">path</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+
+        <span class="n">b</span><span class="o">.</span><span class="na">resource</span><span class="o">(</span><span class="n">ResourceChat</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+         <span class="o">.</span><span class="na">initParam</span><span class="o">(</span><span class="n">ApplicationConfig</span><span class="o">.</span><span class="na">WEBSOCKET_CONTENT_TYPE</span><span class="o">,</span> <span class="s">"application/json"</span><span class="o">)</span>
+         <span class="o">.</span><span class="na">httpServer</span><span class="o">(</span><span class="n">httpServer</span><span class="o">).</span><span class="na">url</span><span class="o">(</span><span class="s">"/chat"</span><span class="o">)</span>
+         <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+
+        <span class="n">httpServer</span><span class="o">.</span><span class="na">listen</span><span class="o">(</span><span class="mi">8080</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p><a href="http://githalytics.com/Atmosphere/atmosphere-vertx"><img src="https://cruel-carlota.pagodabox.com/32168bb100278d916ea2069bf508a99a" alt="githalytics.com alpha" title="githalytics.com"></a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Atmosphere-vertx maintained by <a href="https://github.com/Atmosphere">Atmosphere</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -68,5 +139,6 @@
             } catch(err) {}
           </script>
 
-</body>
+
+  </body>
 </html>
