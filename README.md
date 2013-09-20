@@ -15,7 +15,7 @@ Download Vert.x extension [) or use Maven
      <dependency>
          <groupId>org.atmosphere</groupId>
          <artifactId>atmosphere-vertx</artifactId>
-         <version>1.0.0.beta1</version>
+         <version>1.0.0</version>
      </dependency>
 ```
 For example, the famous [multi-room Chat application](https://github.com/Atmosphere/atmosphere-vertx/blob/master/samples/chat/src/main/java/org/atmosphere/vertx/samples/chat/ChatRoom.java#L37-L124) in Atmosphere
