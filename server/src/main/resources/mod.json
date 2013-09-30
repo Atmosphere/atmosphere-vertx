@@ -1,1 +1,7 @@
-{}
+{
+	"description": "Integrates the atmosphere application with the Vert.x",
+	"licenses": ["The Apache Software License Version 2.0"],
+	"author": "Donghwan Kim",
+	"keywords": ["ws", "websocket", "sse", "serversentevents", "comet", "streaming", "longpolling"],
+	"homepage": "https://github.com/Atmosphere/atmosphere-vertx"
+}
