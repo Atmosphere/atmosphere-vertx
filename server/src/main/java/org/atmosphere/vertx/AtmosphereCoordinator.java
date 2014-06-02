@@ -16,7 +16,6 @@
 package org.atmosphere.vertx;
 
 import io.netty.handler.codec.http.QueryStringDecoder;
-
 import org.atmosphere.container.NettyCometSupport;
 import org.atmosphere.cpr.Action;
 import org.atmosphere.cpr.ApplicationConfig;
@@ -24,9 +23,9 @@ import org.atmosphere.cpr.AsynchronousProcessor;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.FrameworkConfig;
-import org.atmosphere.cpr.HeaderConfig;
 import org.atmosphere.cpr.WebSocketProcessorFactory;
 import org.atmosphere.util.EndpointMapper;
 import org.atmosphere.util.ExecutorsFactory;
@@ -52,7 +51,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.atmosphere.cpr.HeaderConfig.X_ATMOSPHERE_FRAMEWORK;
+import static org.atmosphere.cpr.HeaderConfig.X_ATMOSPHERE_TRACKING_ID;
 import static org.atmosphere.cpr.HeaderConfig.X_ATMOSPHERE_TRANSPORT;
+import static org.atmosphere.cpr.HeaderConfig.X_ATMO_PROTOCOL;
 
 /**
  * This class control the {@link AtmosphereFramework} life cycle.
@@ -66,10 +68,12 @@ public class AtmosphereCoordinator {
     private final ScheduledExecutorService suspendTimer;
     private final EndpointMapper<AtmosphereFramework.AtmosphereHandlerWrapper> mapper;
     private  WebSocketProcessor webSocketProcessor;
+    private final AsynchronousProcessor asynchronousProcessor;
 
     AtmosphereCoordinator() {
         framework = new AtmosphereFramework();
-        framework.setAsyncSupport(new NettyCometSupport(framework().getAtmosphereConfig()));
+        asynchronousProcessor = new NettyCometSupport(framework().getAtmosphereConfig());
+        framework.setAsyncSupport(asynchronousProcessor);
         suspendTimer = ExecutorsFactory.getScheduler(framework.getAtmosphereConfig());
         mapper = framework.endPointMapper();
     }
@@ -164,10 +168,10 @@ public class AtmosphereCoordinator {
         String contentType = "application/json";
         if (params.size() == 0) {
             // TODO: vert.x trim the query string, unfortunately.
-            params.put(HeaderConfig.X_ATMO_PROTOCOL, new String[]{"true"});
-            params.put(HeaderConfig.X_ATMOSPHERE_FRAMEWORK, new String[]{"1.1"});
-            params.put(HeaderConfig.X_ATMOSPHERE_TRACKING_ID, new String[]{"0"});
-            params.put(HeaderConfig.X_ATMOSPHERE_TRANSPORT, new String[]{"websocket"});
+            params.put(X_ATMO_PROTOCOL, new String[]{"true"});
+            params.put(X_ATMOSPHERE_FRAMEWORK, new String[]{"2.1"});
+            params.put(X_ATMOSPHERE_TRACKING_ID, new String[]{"0"});
+            params.put(X_ATMOSPHERE_TRANSPORT, new String[]{"websocket"});
             params.put("Content-Type", new String[]{contentType});
         } else if (params.containsKey("Content-Type") && params.get("Content-Type").length > 0) {
             contentType = params.get("Content-Type")[0];
@@ -218,8 +222,7 @@ public class AtmosphereCoordinator {
         try {
 
             Action a = framework.doCometSupport(request, response);
-            final AsynchronousProcessor.AsynchronousProcessorHook hook = (AsynchronousProcessor.AsynchronousProcessorHook)
-                    request.getAttribute(FrameworkConfig.ASYNCHRONOUS_HOOK);
+            final AtmosphereResourceImpl impl = (AtmosphereResourceImpl) request.getAttribute(FrameworkConfig.ATMOSPHERE_RESOURCE);
 
             String transport = (String) request.getAttribute(FrameworkConfig.TRANSPORT_IN_USE);
             if (transport == null) {
@@ -234,7 +237,7 @@ public class AtmosphereCoordinator {
                     @Override
                     public void run() {
                         if (!w.isClosed() && (System.currentTimeMillis() - w.lastTick()) > action.timeout()) {
-                            hook.timedOut();
+                            asynchronousProcessor.endRequest(impl, false);
                             f.get().cancel(true);
                         }
                     }
