@@ -81,4 +81,4 @@ public class VertxJerseyChat extends Verticle {
     }
 }
 ```
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/32168bb100278d916ea2069bf508a99a "githalytics.com")](http://githalytics.com/Atmosphere/atmosphere-vertx)
+[![Analytics](https://ga-beacon.appspot.com/UA-31990725-2/Atmosphere/atmosphere-vertx)]
