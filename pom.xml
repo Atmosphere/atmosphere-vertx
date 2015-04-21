@@ -264,7 +264,7 @@
         <surefire.redirectTestOutputToFile>false</surefire.redirectTestOutputToFile>
         <source.property>1.7</source.property>
         <target.property>1.7</target.property>
-        <atmosphere.version>2.3.0-SNAPSHOT</atmosphere.version>
+        <atmosphere.version>2.3.0</atmosphere.version>
         <vertx.version>2.1.5</vertx.version>
     </properties>
 </project>
