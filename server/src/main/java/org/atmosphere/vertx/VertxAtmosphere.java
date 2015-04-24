@@ -15,6 +15,8 @@
  */
 package org.atmosphere.vertx;
 
+import io.vertx.core.Vertx;
+import io.vertx.ext.apex.Router;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterCache;
@@ -23,11 +25,10 @@ import org.atmosphere.websocket.WebSocketProtocol;
 import org.atmosphere.websocket.protocol.SimpleHttpProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.http.ServerWebSocket;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.ServerWebSocket;
+import io.vertx.ext.apex.RoutingContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,12 +77,12 @@ public class VertxAtmosphere {
     private VertxAtmosphere(Builder b) {
         this.b = b;
 
-        RouteMatcher routeMatcher = new RouteMatcher();
-        routeMatcher.get(b.url, handleHttp());
-        routeMatcher.post(b.url, handleHttp());
-        routeMatcher.noMatch(b.httpServer.requestHandler());
+        Router router = Router.router(b.vertx);
+        router.get(b.url).handler(handleHttp());
+        router.post(b.url).handler(handleHttp());
 
-        b.httpServer.requestHandler(routeMatcher);
+        b.httpServer.requestHandler(router::accept);
+
         b.httpServer.websocketHandler(handleWebSocket());
 
         if (b.resource != null) {
@@ -114,6 +115,7 @@ public class VertxAtmosphere {
         protected Class<?> resource;
         protected final Map<String, String> initParams = new HashMap<String, String>();
         protected Class<? extends WebSocketProtocol> webSocketProtocol = SimpleHttpProtocol.class;
+        protected Vertx vertx;
 
         protected Class<Broadcaster> broadcasterClass;
         protected BroadcasterFactory broadcasterFactory;
@@ -223,16 +225,20 @@ public class VertxAtmosphere {
             return this;
         }
 
+        public Builder vertx(Vertx vertx) {
+            this.vertx = vertx;
+            return this;
+        }
 
     }
 
-    private Handler<HttpServerRequest> handleHttp() {
+    private Handler<RoutingContext> handleHttp() {
 
-        return new Handler<HttpServerRequest>() {
+        return new Handler<RoutingContext>() {
             @Override
-            public void handle(HttpServerRequest req) {
+            public void handle(RoutingContext req) {
                 logger.trace("HTTP received");
-                coordinator.route(req);
+                coordinator.route(req.request());
             }
         };
     }

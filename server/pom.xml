@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-platform</artifactId>
+            <artifactId>vertx-apex</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -79,7 +79,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.4</version>
+                <version>2.5.3</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
