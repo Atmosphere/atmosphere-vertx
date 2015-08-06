@@ -37,7 +37,7 @@ import java.util.Map;
 
 /**
  * A boostrap class that can be used to bridge Atmosphere and Vert.x. As simple as
- * <pre><blockquote>
+ * <pre>
  public class VertxJerseyChat extends Verticle {
 
      private static final Logger logger = LoggerFactory.getLogger(VertxJerseyChat.class);
@@ -65,7 +65,7 @@ import java.util.Map;
          httpServer.listen(8080);
      }
  }
- * </blockquote></pre>
+ * </pre>
  * @author  Jeanfrancois Arcand
  */
 public class VertxAtmosphere {
@@ -93,7 +93,7 @@ public class VertxAtmosphere {
 
     /**
      * Return the bound @{link AtmosphereCoordinator}.
-     * @return @{link AtmosphereCoordinator}.
+     * @return the @{link AtmosphereCoordinator}.
      */
     public AtmosphereCoordinator coordinator() {
         return coordinator;
@@ -101,7 +101,7 @@ public class VertxAtmosphere {
 
     /**
      * Is the path match one of the resource deployed.
-     * @param path
+     * @param path the resource path.
      * @return boolean if true.
      */
     public boolean matchPath(String path) {
@@ -150,7 +150,7 @@ public class VertxAtmosphere {
          * {@link org.atmosphere.config.service.AtmosphereHandlerService}, {@link org.atmosphere.config.service.MeteorService},
          * {@link org.atmosphere.config.service.WebSocketHandlerService} and any Jersey resource.
          *
-         * @param resource
+         * @param resource the annotated resource Class.
          * @return this;
          */
         public Builder resource(Class<?> resource) {
@@ -218,7 +218,7 @@ public class VertxAtmosphere {
          * Add an {@link AtmosphereInterceptor}
          *
          * @param interceptor an {@link AtmosphereInterceptor}
-         * @return
+         * @return this
          */
         public Builder interceptor(AtmosphereInterceptor interceptor) {
             interceptors.add(interceptor);

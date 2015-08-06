@@ -156,7 +156,9 @@ public class AtmosphereCoordinator {
      * Route the {@link ServerWebSocket} into the {@link AtmosphereFramework}
      *
      * @param webSocket the {@link ServerWebSocket}
+	 * @return the the {@link AtmosphereCoordinator}
      */
+
     public AtmosphereCoordinator route(ServerWebSocket webSocket) {
         Map<String, List<String>> paramMap = new QueryStringDecoder("?" + webSocket.query()).parameters();
         Map<String, String[]> params = new LinkedHashMap<String, String[]>(paramMap.size());
@@ -251,7 +253,8 @@ public class AtmosphereCoordinator {
     /**
      * Route an http request inside the {@link AtmosphereFramework}
      *
-     * @param request
+     * @param request the {@link HttpServerRequest}
+	 * @return the {@link AtmosphereCoordinator}
      */
     public AtmosphereCoordinator route(final HttpServerRequest request) {
         boolean async = false;
