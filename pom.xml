@@ -61,7 +61,7 @@
 			</dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
-                <artifactId>vertx-apex</artifactId>
+                <artifactId>vertx-web</artifactId>
                 <version>${vertx.version}</version>
             </dependency>
             <dependency>
@@ -178,7 +178,7 @@
                 <version>2.7</version>
                 <configuration>
                     <aggregate>true</aggregate>
-                    <source>1.6</source>
+                    <source>1.8</source>
                     <encoding>UTF-8</encoding>
                     <maxmemory>1g</maxmemory>
                     <links>
@@ -270,7 +270,7 @@
         <source.property>1.8</source.property>
         <target.property>1.8</target.property>
         <atmosphere.version>2.3.4-SNAPSHOT</atmosphere.version>
-        <vertx.version>3.0.0-SNAPSHOT</vertx.version>
+        <vertx.version>3.0.0</vertx.version>
     </properties>
 </project>
 

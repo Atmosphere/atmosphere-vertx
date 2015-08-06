@@ -16,7 +16,7 @@
 package org.atmosphere.vertx;
 
 import io.vertx.core.Vertx;
-import io.vertx.ext.apex.Router;
+import io.vertx.ext.web.Router;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterCache;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
-import io.vertx.ext.apex.RoutingContext;
+import io.vertx.ext.web.RoutingContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
