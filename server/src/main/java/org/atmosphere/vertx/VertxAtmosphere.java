@@ -17,6 +17,7 @@ package org.atmosphere.vertx;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterCache;
@@ -70,14 +71,11 @@ import java.util.Map;
  */
 public class VertxAtmosphere {
     private static final Logger logger = LoggerFactory.getLogger(VertxAtmosphere.class);
-
-    private final Builder b;
     private final AtmosphereCoordinator coordinator = new AtmosphereCoordinator();
 
     private VertxAtmosphere(Builder b) {
-        this.b = b;
-
         Router router = Router.router(b.vertx);
+        router.route().handler(StaticHandler.create(b.webroot));
         router.get(b.url).handler(handleHttp());
         router.post(b.url).handler(handleHttp());
 
@@ -121,9 +119,18 @@ public class VertxAtmosphere {
         protected BroadcasterFactory broadcasterFactory;
         protected Class<? extends BroadcasterCache> broadcasterCache;
         protected final List<AtmosphereInterceptor> interceptors = new ArrayList<AtmosphereInterceptor>();
+        protected String webroot;
 
         public Builder url(String url) {
             this.url = url;
+            return this;
+        }
+
+        /**
+         * The static resource path
+         */
+        public Builder webroot(String webroot) {
+            this.webroot = webroot;
             return this;
         }
 
