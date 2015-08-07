@@ -34,12 +34,11 @@ import org.atmosphere.websocket.WebSocket;
 import org.atmosphere.websocket.WebSocketProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.VoidHandler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.ServerWebSocket;
-
+import io.vertx.core.Handler;
+import io.vertx.core.VoidHandler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.ServerWebSocket;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -157,7 +156,9 @@ public class AtmosphereCoordinator {
      * Route the {@link ServerWebSocket} into the {@link AtmosphereFramework}
      *
      * @param webSocket the {@link ServerWebSocket}
+	 * @return the the {@link AtmosphereCoordinator}
      */
+
     public AtmosphereCoordinator route(ServerWebSocket webSocket) {
         Map<String, List<String>> paramMap = new QueryStringDecoder("?" + webSocket.query()).parameters();
         Map<String, String[]> params = new LinkedHashMap<String, String[]>(paramMap.size());
@@ -193,7 +194,7 @@ public class AtmosphereCoordinator {
             logger.debug("", e);
         }
 
-        webSocket.dataHandler(new Handler<Buffer>() {
+        webSocket.handler(new Handler<Buffer>() {
             @Override
             public void handle(Buffer data) {
                 webSocketProcessor.invokeWebSocketProtocol(w, data.toString());
@@ -252,7 +253,8 @@ public class AtmosphereCoordinator {
     /**
      * Route an http request inside the {@link AtmosphereFramework}
      *
-     * @param request
+     * @param request the {@link HttpServerRequest}
+	 * @return the {@link AtmosphereCoordinator}
      */
     public AtmosphereCoordinator route(final HttpServerRequest request) {
         boolean async = false;

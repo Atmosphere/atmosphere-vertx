@@ -18,7 +18,9 @@ package org.atmosphere.vertx;
 import org.atmosphere.cpr.AtmosphereConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertx.java.core.http.ServerWebSocket;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.ServerWebSocket;
+import io.vertx.core.http.WebSocketFrame;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,7 +46,8 @@ public class VertxWebSocket extends org.atmosphere.websocket.WebSocket {
     @Override
     public org.atmosphere.websocket.WebSocket write(String data) throws IOException {
         logger.trace("WebSocket.write()");
-        webSocket.writeTextFrame(data);
+
+        webSocket.writeFrame(WebSocketFrame.textFrame(data, true));
         lastWrite = System.currentTimeMillis();
         return this;
     }
@@ -54,7 +57,9 @@ public class VertxWebSocket extends org.atmosphere.websocket.WebSocket {
      */
     @Override
     public org.atmosphere.websocket.WebSocket write(byte[] data, int offset, int length) throws IOException {
-        webSocket.writeTextFrame(new String(data, offset, length, "UTF-8"));
+        Buffer buf = Buffer.buffer().appendBytes(data, offset, length);
+
+        webSocket.writeFrame(WebSocketFrame.binaryFrame(buf, true));
         return this;
     }
 

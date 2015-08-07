@@ -20,8 +20,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerRequest;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class AtmosphereUtils {
         if (request.headers().get("Content-Type") != null) {
             ct = request.headers().get("Content-Type");
         }
-        String method = request.method();
+        String method = request.method().name();
 
 
         URI uri = null;
