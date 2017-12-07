@@ -10,7 +10,7 @@
     <groupId>org.atmosphere</groupId>
     <artifactId>atmosphere-vertx</artifactId>
     <name>atmosphere-vertx Server</name>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>2.4.8-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <vertx.pullInDeps>false</vertx.pullInDeps>
@@ -25,6 +25,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
+            <version>3.5.0</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
