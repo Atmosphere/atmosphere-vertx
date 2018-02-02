@@ -14,10 +14,10 @@ Download Vert.x extension [) or use Maven
      <dependency>
          <groupId>org.atmosphere</groupId>
          <artifactId>atmosphere-vertx</artifactId>
-         <version>2.1.0</version>
+         <version>3.0.0</version>
      </dependency>
 ```
-For example, the famous [multi-room Chat application](https://github.com/Atmosphere/atmosphere-vertx/blob/master/samples/chat/src/main/java/org/atmosphere/vertx/samples/chat/ChatRoom.java#L37-L124) in Atmosphere
+For example, the famous [multi-room Chat application](https://github.com/Atmosphere/atmosphere-samples/blob/master/vertx-samples/chat/src/main/java/org/atmosphere/vertx/samples/chat/VertxChatServer.java) in Atmosphere
 Can be run on top of Vert.x by doing:
 ```java
 public class VertxChatServer extends AbstractVerticle {
