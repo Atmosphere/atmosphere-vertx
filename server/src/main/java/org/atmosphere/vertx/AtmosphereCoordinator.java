@@ -21,7 +21,18 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import org.atmosphere.container.NettyCometSupport;
-import org.atmosphere.cpr.*;
+import org.atmosphere.cpr.Action;
+import org.atmosphere.cpr.ApplicationConfig;
+import org.atmosphere.cpr.AsynchronousProcessor;
+import org.atmosphere.cpr.AtmosphereFramework;
+import org.atmosphere.cpr.AtmosphereInterceptor;
+import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereRequestImpl;
+import org.atmosphere.cpr.AtmosphereResourceImpl;
+import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.AtmosphereResponseImpl;
+import org.atmosphere.cpr.FrameworkConfig;
+import org.atmosphere.cpr.WebSocketProcessorFactory;
 import org.atmosphere.util.EndpointMapper;
 import org.atmosphere.util.ExecutorsFactory;
 import org.atmosphere.util.ServletProxyFactory;
@@ -200,13 +211,6 @@ public class AtmosphereCoordinator {
             w.close();
             webSocketProcessor.close(w, 1005);
         });
-//        webSocket.closeHandler(new VoidHandler() {
-//            @Override
-//            protected void handle() {
-//                w.close();
-//                webSocketProcessor.close(w, 1005);
-//            }
-//        });
         return this;
     }
 
@@ -225,7 +229,7 @@ public class AtmosphereCoordinator {
             logger.debug("Transport {} action {}", transport, a);
             final Action action = (Action) request.getAttribute(NettyCometSupport.SUSPEND);
             if (action != null && action.type() == Action.TYPE.SUSPEND && action.timeout() != -1) {
-                final AtomicReference<Future<?>> f = new AtomicReference();
+                final AtomicReference<Future<?>> f = new AtomicReference<>();
                 f.set(suspendTimer.scheduleAtFixedRate(new Runnable() {
                     @Override
                     public void run() {
@@ -275,16 +279,13 @@ public class AtmosphereCoordinator {
 
             if (r.getMethod().equalsIgnoreCase("POST")) {
                 async = true;
-                request.bodyHandler(new Handler<Buffer>() {
-                    @Override
-                    public void handle(Buffer body) {
-                        r.body(body.toString());
-                        try {
-                            route(r, res);
-                            request.response().end();
-                        } catch (IOException e1) {
-                            logger.debug("", e1);
-                        }
+                request.bodyHandler(body -> {
+                    r.body(body.toString());
+                    try {
+                        route(r, res);
+                        request.response().end();
+                    } catch (IOException e1) {
+                        logger.debug("", e1);
                     }
                 });
             }

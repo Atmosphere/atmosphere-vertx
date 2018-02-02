@@ -16,12 +16,11 @@
 package org.atmosphere.vertx;
 
 import io.netty.handler.codec.http.HttpHeaders;
-
+import io.vertx.core.http.HttpServerRequest;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereRequestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.vertx.core.http.HttpServerRequest;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -55,7 +54,7 @@ public class AtmosphereUtils {
         }
 
         String u = requestUri.toURL().toString();
-        int last = u.indexOf("?") == -1 ? u.length() : u.indexOf("?");
+        int last = !u.contains("?") ? u.length() : u.indexOf("?");
         String url = u.substring(0, last);
         int l = requestUri.getAuthority().length() + requestUri.getScheme().length() + 3;
 
@@ -63,7 +62,7 @@ public class AtmosphereUtils {
 
         final StringBuilder b = new StringBuilder();
 
-        int port = uri == null ? 0 : uri.getPort();
+        int port = uri.getPort();
         String uriString = uri.getPath();
         String host = uri.getHost();
         AtmosphereRequest.Builder requestBuilder = new AtmosphereRequestImpl.Builder();
@@ -80,9 +79,6 @@ public class AtmosphereUtils {
                 .remotePort(port)
                 .remoteAddr(uriString)
                 .remoteHost(host)
-//                .localPort(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getPort())
-//                .localAddr(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getAddress().getHostAddress())
-//                .localName(((InetSocketAddress) ctx.getChannel().getLocalAddress()).getHostName())
                 .body(b.toString())
                 .queryStrings(qs)
                 .build();
