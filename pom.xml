@@ -9,7 +9,7 @@
     <groupId>org.atmosphere</groupId>
     <artifactId>atmosphere-vertx-project</artifactId>
     <name>atmosphere-vertx Project</name>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>
         atmosphere-vertx: A HTTP/WebSocket server powered by Atmosphere and Vert.x Framework
