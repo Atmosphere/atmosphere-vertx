@@ -8,7 +8,7 @@ The easiest way to get started with Vert.x is to download a sample and start it.
 
 Samples are the same as then one available in Atmosphere, e.g everything that works with Atmosphere works AS-IT-IS with the Vert.x module.
 
-Download Vert.x extension [) or use Maven
+Download using Maven
 
 ```xml
      <dependency>
