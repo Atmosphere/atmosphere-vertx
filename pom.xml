@@ -72,7 +72,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.0.7</version>
+                <version>1.2.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -97,9 +97,8 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>5.8</version>
+                <version>7.1.0</version>
                 <scope>test</scope>
-                <classifier>jdk15</classifier>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -115,7 +114,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-beta-6</version>
+                <version>3.4.0</version>
             </extension>
         </extensions>
         <defaultGoal>install</defaultGoal>
@@ -123,7 +122,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${source.property}</source>
                     <target>${target.property}</target>
@@ -133,11 +132,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.1</version>
+                <version>3.0.0-M1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.1.0</version>
                 <configuration>
                     <filesets>
                         <fileset>
@@ -161,7 +160,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -175,7 +174,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.2.0</version>
                 <configuration>
                     <aggregate>true</aggregate>
                     <source>1.8</source>
@@ -198,7 +197,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
+                <version>3.0.0</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
@@ -224,7 +223,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
+                <version>3.0.0</version>
                 <configuration>
                     <aggregate>true</aggregate>
                 </configuration>
@@ -269,8 +268,8 @@
         <surefire.redirectTestOutputToFile>false</surefire.redirectTestOutputToFile>
         <source.property>1.8</source.property>
         <target.property>1.8</target.property>
-        <atmosphere.version>2.4.20</atmosphere.version>
-        <vertx.version>3.5.0</vertx.version>
+        <atmosphere.version>2.6.0</atmosphere.version>
+        <vertx.version>3.5.4</vertx.version>
     </properties>
 </project>
 
