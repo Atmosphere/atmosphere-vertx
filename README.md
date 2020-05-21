@@ -18,7 +18,8 @@ Download using Maven
      </dependency>
 ```
 ![JDK8](https://github.com/Atmosphere/atmosphere-vertx/workflows/JDK8/badge.svg) 
-
+![JDK11](https://github.com/Atmosphere/atmosphere-vertx/workflows/JDK11/badge.svg)
+![JDK13](https://github.com/Atmosphere/atmosphere-vertx/workflows/JDK13/badge.svg)
 
 For example, the famous [multi-room Chat application](https://github.com/Atmosphere/atmosphere-samples/blob/master/vertx-samples/chat/src/main/java/org/atmosphere/vertx/samples/chat/VertxChatServer.java) in Atmosphere
 Can be run on top of Vert.x by doing:
