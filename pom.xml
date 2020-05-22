@@ -9,7 +9,7 @@
     <groupId>org.atmosphere</groupId>
     <artifactId>atmosphere-vertx-project</artifactId>
     <name>atmosphere-vertx Project</name>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.0.2</version>
     <packaging>pom</packaging>
     <description>
         atmosphere-vertx: A HTTP/WebSocket server powered by Atmosphere and Vert.x Framework
@@ -19,7 +19,7 @@
         <connection>scm:git:git@github.com:Atmosphere/atmosphere-vertx.git</connection>
         <url>https://github.com/Atmosphere/atmosphere-vertx</url>
         <developerConnection>scm:git:git@github.com:Atmosphere/atmosphere-vertx.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>atmosphere-vertx-project-3.0.2</tag>
   </scm>
     <issueManagement>
         <system>github</system>
