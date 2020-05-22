@@ -3,14 +3,14 @@
     <parent>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-vertx-project</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.3-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.atmosphere</groupId>
     <artifactId>atmosphere-vertx</artifactId>
     <name>atmosphere-vertx Server</name>
-    <version>3.0.2</version>
+    <version>3.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <vertx.pullInDeps>false</vertx.pullInDeps>
