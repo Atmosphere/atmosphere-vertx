@@ -1,3 +1,11 @@
+> **⚠️ This repository is legacy and no longer actively maintained.**
+>
+> The Atmosphere Framework now runs natively on Spring Boot 4 and Quarkus 3 without needing a Vert.x adapter. See the [Atmosphere 4](https://github.com/Atmosphere/atmosphere) monorepo.
+>
+> **→ [github.com/Atmosphere/atmosphere](https://github.com/Atmosphere/atmosphere)**
+
+---
+
 ### Vertosphere: A Java WebSocket and HTTP server powered by the [Atmosphere Framework](http://github.com/Atmosphere/atmosphere) and the [Vert.x](http://vertx.io/)  Framework.
 
 The easiest way to get started with Vert.x is to download a sample and start it. [Or look at the Javadoc](http://atmosphere.github.io/atmosphere-vertx/apidocs/). Samples are available [here](https://github.com/Atmosphere/atmosphere-samples/tree/master/vertx-samples)
